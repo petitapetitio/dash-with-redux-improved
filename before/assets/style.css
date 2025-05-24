@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    text-align: center;
+}
+
+#app-layout {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#container {
+    width: 400px;
+}
+
+label {
+    margin-top: 8px;
+    display: inline-block;
+}
+
+#output {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: x-large;
+}
