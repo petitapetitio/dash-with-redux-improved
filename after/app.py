@@ -2,7 +2,7 @@ import dash
 from dash import html, dcc, Output, Input, State
 
 from database import Database
-from state import INITIAL_STATE, reduce, Action
+from state import INITIAL_STATE, reduce, SetupCity, SelectCountry, SelectCity, SetMessage, SendMessage
 
 app = dash.Dash(__name__)
 
@@ -64,15 +64,10 @@ def on_select_country(selected_country: str | None, state: dict):
     if selected_country == state["country"]:
         return dash.no_update
 
-    state = reduce(state, Action.SELECT_COUNTRY, selected_country)
-    state = reduce(
-        state,
-        Action.SETUP_CITY,
-        {
-            "options": db.get_cities(selected_country) if selected_country is not None else [],
-            "value": None,
-        },
-    )
+    cities = db.get_cities(selected_country) if selected_country is not None else []
+
+    state = reduce(state, SelectCountry(selected_country))
+    state = reduce(state, SetupCity(options=cities, value=None))
     return state
 
 
@@ -86,7 +81,7 @@ def on_select_city(selected_city: str | None, state: dict):
     if selected_city == state["city-dropdown"]["value"]:
         return dash.no_update
 
-    return reduce(state, Action.SELECT_CITY, selected_city)
+    return reduce(state, SelectCity(selected_city))
 
 
 @app.callback(
@@ -99,7 +94,7 @@ def on_type_message(message: str, state: dict):
     if message == state["message-input"]["value"]:
         return dash.no_update
 
-    return reduce(state, Action.SET_MESSAGE, message)
+    return reduce(state, SetMessage(message))
 
 
 @app.callback(
@@ -112,10 +107,10 @@ def on_click_send(n: int | None, state: dict):
     if n is None:
         return dash.no_update
 
-    state = reduce(state, Action.SEND_MESSAGE)
-    state = reduce(state, Action.SELECT_COUNTRY, None)
-    state = reduce(state, Action.SETUP_CITY, {"options": [], "value": None})
-    state = reduce(state, Action.SET_MESSAGE, "")
+    state = reduce(state, SendMessage())
+    state = reduce(state, SelectCountry.reset())
+    state = reduce(state, SetupCity.reset())
+    state = reduce(state, SetMessage.reset())
     return state
 
 
