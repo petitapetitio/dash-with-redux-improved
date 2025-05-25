@@ -15,9 +15,8 @@ body {
     width: 400px;
 }
 
-label {
-    margin-top: 8px;
-    display: inline-block;
+form > *{
+    margin: 8px;
 }
 
 #output {

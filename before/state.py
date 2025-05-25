@@ -8,50 +8,69 @@ INITIAL_STATE = {
         "value": None,
         "disabled": True,
     },
-    "signal-dropdown": {
+    "message-input": {
+        "value": "",
         "disabled": True,
     },
-    "result": ""
-}
-
-CITIES_BY_COUNTRY = {
-    "France": ["Paris", "Lyon", "Marseille"],
-    "USA": ["New York", "Los Angeles", "Chicago"],
-    "Japan": ["Tokyo", "Kyoto", "Osaka"],
+    "send-button": {
+        "disabled": True,
+    },
+    "result": "",
 }
 
 
 class Action(Enum):
     SELECT_COUNTRY = auto()
+    SETUP_CITY = auto()
     SELECT_CITY = auto()
-    SEND_SIGNAL = auto()
+    SET_MESSAGE = auto()
+    SEND_MESSAGE = auto()
 
 
 def reduce(state: dict, action: Action, payload=None) -> dict:
     if action == Action.SELECT_COUNTRY:
-        cities = CITIES_BY_COUNTRY[payload]
         return state | {
             "country": payload,
-            "city-dropdown": {
-                "options": [{"label": city, "value": city} for city in cities],
-                "value": None,
-                "disabled": False,
-            }
         }
+    if action == Action.SETUP_CITY:
+        return state | {
+            "city-dropdown": {
+                "options": payload["options"],
+                "value": payload["value"],
+                "disabled": len(payload["options"]) == 0,
+            },
+        }
+
     if action == Action.SELECT_CITY:
         return state | {
             "city-dropdown": {
                 **state["city-dropdown"],
                 "value": payload,
             },
-            "signal-dropdown": {
-                **state["signal-dropdown"],
+            "message-input": {
+                **state["message-input"],
                 "disabled": False,
             },
         }
-    if action == Action.SEND_SIGNAL:
+
+    if action == Action.SET_MESSAGE:
+        message = payload
         return state | {
-            "result": f"You just sent {payload} to {state['city-dropdown']['value']} ({state['country']})."
+            "message-input": {
+                **state["message-input"],
+                "value": message,
+            },
+            "send-button": {
+                "disabled": len(message) == 0,
+            },
+        }
+    if action == Action.SEND_MESSAGE:
+        return state | {
+            "result": f"You just sent « {state["message-input"]["value"]} » to {state['city-dropdown']['value']} ({state['country']}).",
+            "message-input": {
+                "value": "",
+                "disabled": True,
+            },
         }
 
     raise NotImplementedError(f"Reducer for {action} isn't implemented.")
