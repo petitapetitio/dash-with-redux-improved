@@ -64,15 +64,10 @@ def on_select_country(selected_country: str | None, state: dict):
     if selected_country == state["country"]:
         return dash.no_update
 
+    cities = db.get_cities(selected_country) if selected_country is not None else []
+
     state = reduce(state, Action.SELECT_COUNTRY, selected_country)
-    state = reduce(
-        state,
-        Action.SETUP_CITY,
-        {
-            "options": db.get_cities(selected_country) if selected_country is not None else [],
-            "value": None,
-        },
-    )
+    state = reduce(state, Action.SETUP_CITY, {"options": cities, "value": None})
     return state
 
 

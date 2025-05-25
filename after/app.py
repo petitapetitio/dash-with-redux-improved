@@ -2,7 +2,15 @@ import dash
 from dash import html, dcc, Output, Input, State
 
 from database import Database
-from state import INITIAL_STATE, reduce, SetupCity, SelectCountry, SelectCity, SetMessage, SendMessage
+from state import (
+    INITIAL_STATE,
+    reduce,
+    SetupCity,
+    SelectCountry,
+    SelectCity,
+    SetMessage,
+    SendMessage,
+)
 
 app = dash.Dash(__name__)
 
